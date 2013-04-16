@@ -15,8 +15,8 @@ module PrintR
 
     def _to_object(str, indent)
       str = str.strip
-      sp = "    " * indent
-      md = str.match(/^(?:Array|.*? Object)\n#{sp}\(\n(.+)#{sp}\)$/m)
+      tab = "    " * indent
+      md = str.match(/^(?:Array|.*? Object)\n#{tab}\(\n(.+)#{tab}\)$/m)
       if md
         obj = _to_key_values(md[1].split(/(\r\n|\r|\n)/), indent+1)
 
@@ -30,30 +30,30 @@ module PrintR
     end
 
     def _to_key_values(lines, indent)
-      sp = "    " * indent
+      tab = "    " * indent
       h = {}
-      tmp_key = nil
-      tmp_val = ""
+      key = nil
+      val = ""
       lines.each do |line|
-        md = line.match(/^#{sp}\[([^\]]+)\] => (.*)/)
+        md = line.match(/^#{tab}\[([^\]]+)\] => (.*)/)
         if md
-          if tmp_key
-            h[tmp_key] = tmp_val
-            tmp_key = nil
-            tmp_val = ""
+          if key
+            h[key] = val
+            key = nil
+            val = ""
           end
 
-          tmp_key = md[1]
-          tmp_val = md[2]
+          key = md[1]
+          val = md[2]
         else
-          tmp_val += line
+          val += line
         end
       end
 
-      if tmp_key
-        h[tmp_key] = tmp_val
-        tmp_key = nil
-        tmp_val = ""
+      if key
+        h[key] = val
+        key = nil
+        val = ""
       end
 
       h

@@ -14,8 +14,8 @@ module PrintR
     end
 
     def _to_str(obj, indent)
-      sp1 = "    " * indent
-      sp2 = "    " * (indent+1)
+      tab1 = "    " * indent
+      tab2 = "    " * (indent+1)
       str = nil
       type = "Array"
 
@@ -40,11 +40,11 @@ module PrintR
 
       if obj.kind_of?(Hash)
         str = "#{type}\n"
-        str += sp1 + "(\n"
+        str += tab1 + "(\n"
         obj.each_pair do |key,value|
-          str += sprintf("%s[%s] => %s\n", sp2, key, _to_str(value, indent+2))
+          str += sprintf("%s[%s] => %s\n", tab2, key, _to_str(value, indent+2))
         end
-        str += sp1 + ")\n"
+        str += tab1 + ")\n"
       else
         str = obj.to_s
       end
