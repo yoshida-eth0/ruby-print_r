@@ -16,7 +16,7 @@ module PrintR
     def _to_object(str, indent)
       str = str.strip
       tab = "    " * indent
-      md = str.match(/^(?:Array|.*? Object)\n#{tab}\(\n(.+)#{tab}\)$/m)
+      md = str.match(/^(?:Array|.*? Object)\n#{tab}\(\n(.*)#{tab}\)$/m)
       if md
         obj = _to_key_values(md[1].split(/(\r\n|\r|\n)/), indent+1)
 
