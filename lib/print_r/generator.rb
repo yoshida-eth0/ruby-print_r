@@ -17,20 +17,17 @@ module PrintR
       tab1 = "    " * indent
       tab2 = "    " * (indent+1)
       str = nil
-      type = "Array"
+      type = obj.class.name
 
-      if obj.kind_of?(Hash)
-        type = "Array"
-      elsif obj.kind_of?(Array)
-        type = "Array"
+      if obj.kind_of?(Array)
         obj2 = {}
         obj.each_with_index do |value,i|
           obj2[i] = value
         end
         obj = obj2
+      elsif obj.kind_of?(Hash)
       elsif obj.kind_of?(String)
       elsif obj.respond_to?(:instance_variables)
-        type = "#{obj.class.name} Object"
         obj = obj.instance_variables.inject({}) {|h,key|
           key_str = key.to_s.sub("@", "")
           h[key_str] = obj.instance_variable_get(key)
@@ -39,7 +36,7 @@ module PrintR
       end
 
       if obj.kind_of?(Hash)
-        str = "#{type}\n"
+        str = "#{type} Object\n"
         str += tab1 + "(\n"
         obj.each_pair do |key,value|
           str += sprintf("%s[%s] => %s\n", tab2, key, _to_str(value, indent+2))
