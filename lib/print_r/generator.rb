@@ -3,36 +3,30 @@
 
 module PrintR
   class Generator
-    @@default_max_allowed_stack_size = 10
-    @@default_raise_stack_overflow_exception = false
-
-    # class variables accessor
-    def self.default_max_allowed_stack_size; @@default_max_allowed_stack_size; end
-    def self.default_max_allowed_stack_size=(val); @@default_max_allowed_stack_size = val.to_i; end
-
-    def self.default_raise_stack_overflow_exception; @@default_raise_stack_overflow_exception; end
-    def self.default_raise_stack_overflow_exception=(val); @@default_raise_stack_overflow_exception = val.present?; end
-
-    # instance variables accessor
     attr_reader :object
-    attr_reader :max_allowed_stack_size
-    attr_reader :raise_stack_overflow_exception
 
-    def initialize(object, max_allowed_stack_size=nil, raise_stack_overflow_exception=nil)
+    def initialize(object)
       @object = object
-      @max_allowed_stack_size = max_allowed_stack_size.nil? ? @@default_max_allowed_stack_size : max_allowed_stack_size.to_i
-      @raise_stack_overflow_exception = raise_stack_overflow_exception.nil? ? @@default_raise_stack_overflow_exception : !!raise_stack_overflow_exception
+      @recursive_objects = nil
     end
 
     def generate
-      _to_str(object, 0)
+      begin
+        @recursive_objects = Hash.new(0)
+        _to_str(object, 0)
+      ensure
+        @recursive_objects = nil
+      end
     end
 
     def _to_str(obj, indent)
       tab1 = "    " * indent
       tab2 = "    " * (indent+1)
       str = nil
-      type = obj.class.name
+      object_type = obj.class.name
+
+      is_recursive = 1<@recursive_objects[obj.object_id]
+      @recursive_objects[obj.object_id] += 1
 
       case obj
       when Array
@@ -79,22 +73,17 @@ module PrintR
       # to string
       case obj
       when Hash
-        # check stack size
-        if max_allowed_stack_size<=indent/2
-          if raise_stack_overflow_exception
-            raise RuntimeException, "PrintR::Generator stack overflow"
-          else
-            return "PrintR::Generator stack overflow"
-          end
-        end
+        str = "#{object_type} Object\n"
 
-        # recursive _to_str
-        str = "#{type} Object\n"
-        str += tab1 + "(\n"
-        obj.each_pair do |key,value|
-          str += sprintf("%s[%s] => %s\n", tab2, key, _to_str(value, indent+2))
+        if is_recursive
+          str += " *RECURSION*"
+        else
+          str += tab1 + "(\n"
+          obj.each_pair do |key,value|
+            str += sprintf("%s[%s] => %s\n", tab2, key, _to_str(value, indent+2))
+          end
+          str += tab1 + ")\n"
         end
-        str += tab1 + ")\n"
       else
         str = "#{obj}"
       end

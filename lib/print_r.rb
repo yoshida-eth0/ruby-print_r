@@ -3,6 +3,7 @@
 
 require 'print_r/parser'
 require 'print_r/generator'
+require 'print_r/recursion'
 require 'print_r/version'
 
 module PrintR
