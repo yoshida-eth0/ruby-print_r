@@ -28,7 +28,7 @@ h = {
     @key3 = "value3"
     self
   },
-  :exception => Exception.new("aaa"),
+  :exception => StandardError.new("aaa"),
 }
 h[:deep] = h.dup
 puts PrintR.generate(h)

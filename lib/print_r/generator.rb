@@ -24,9 +24,7 @@ module PrintR
       tab2 = "    " * (indent+1)
       str = nil
       object_type = obj.class.name
-
-      is_recursive = 1<@recursive_objects[obj.object_id]
-      @recursive_objects[obj.object_id] += 1
+      obj_id = obj.respond_to?(:object_id) ? obj.object_id : obj.__id__
 
       case obj
       when Array
@@ -75,6 +73,9 @@ module PrintR
       when Hash
         str = "#{object_type} Object\n"
 
+        is_recursive = 1<@recursive_objects[obj_id]
+        @recursive_objects[obj_id] += 1
+
         if is_recursive
           str += " *RECURSION*"
         else
@@ -84,6 +85,8 @@ module PrintR
           end
           str += tab1 + ")\n"
         end
+
+        @recursive_objects[obj_id] -= 1
       else
         str = "#{obj}"
       end
